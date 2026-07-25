@@ -1,0 +1,5 @@
+const NAME='science-hero',VERSION=1;let memory={questions:[],attempts:[],settings:[]};
+export function openDB(){return new Promise((resolve,reject)=>{if(!indexedDB)return reject(Error('IndexedDB unavailable'));const r=indexedDB.open(NAME,VERSION);r.onupgradeneeded=()=>{for(const s of ['questions','attempts','settings'])if(!r.result.objectStoreNames.contains(s))r.result.createObjectStore(s,{keyPath:s==='settings'?'key':'id'})};r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error)})}
+export async function all(store){try{const db=await openDB();return await new Promise((ok,no)=>{const r=db.transaction(store).objectStore(store).getAll();r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)})}catch{return memory[store]}}
+export async function put(store,value){try{const db=await openDB();return await new Promise((ok,no)=>{const r=db.transaction(store,'readwrite').objectStore(store).put(value);r.onsuccess=()=>ok(value);r.onerror=()=>no(r.error)})}catch{const i=memory[store].findIndex(x=>x.id===value.id);i<0?memory[store].push(value):memory[store][i]=value;return value}}
+export async function bulkPut(store,values){for(const v of values)await put(store,v)}

@@ -1,0 +1,3 @@
+// ใส่ค่าจาก Firebase console ผ่านตัวแปร VITE_FIREBASE_*; หากไม่ครบ แอปจะใช้ IndexedDB ออฟไลน์
+export const firebaseConfig={apiKey:import.meta.env.VITE_FIREBASE_API_KEY,authDomain:import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,projectId:import.meta.env.VITE_FIREBASE_PROJECT_ID,appId:import.meta.env.VITE_FIREBASE_APP_ID};
+export async function initCloud(){if(!firebaseConfig.apiKey)return null;const [{initializeApp},{getFirestore,enableIndexedDbPersistence}]=await Promise.all([import('firebase/app'),import('firebase/firestore')]);const db=getFirestore(initializeApp(firebaseConfig));enableIndexedDbPersistence(db).catch(()=>{});return db}
