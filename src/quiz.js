@@ -1,0 +1,6 @@
+export const TARGET_LEVELS=[...Array(12).fill(5),...Array(10).fill(6),...Array(8).fill(7)];
+export function shuffle(items,rng=Math.random){const a=[...items];for(let i=a.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+export function shuffleQuestion(q,rng=Math.random){const tagged=q.options.map((text,i)=>({text,correct:i===q.correct}));const mixed=shuffle(tagged,rng);return {...q,options:mixed.map(x=>x.text),correct:mixed.findIndex(x=>x.correct)}}
+export function selectQuestions(bank,history=[],count=30,rng=Math.random){const enabled=bank.filter(q=>q.enabled!==false);const recent=new Set(history.slice(-30));let pool=enabled.filter(q=>!history.includes(q.id));if(pool.length<count) pool=enabled.filter(q=>!recent.has(q.id));if(pool.length<count) pool=enabled;return shuffle(pool,rng).slice(0,count).map(q=>shuffleQuestion(q,rng))}
+export function normalizeText(s){return String(s).normalize('NFKC').trim().toLocaleLowerCase('th').replace(/\s+/g,' ')}
+export async function questionHash(q){const raw=normalizeText(`${q.grade}|${q.topic}|${q.question}|${q.options.join('|')}`);const bytes=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(raw));return [...new Uint8Array(bytes)].map(x=>x.toString(16).padStart(2,'0')).join('')}

@@ -1,0 +1,4 @@
+import {describe,it,expect} from 'vitest';import {selectQuestions,shuffleQuestion} from '../src/quiz.js';
+const bank=Array.from({length:100},(_,i)=>({id:`Q${i}`,options:['ถูก','ข','ค','ง'],correct:0}));
+describe('quiz selection',()=>{it('does not repeat previously seen questions while enough unseen remain',()=>{const selected=selectQuestions(bank,bank.slice(0,40).map(x=>x.id),30,()=>.5);expect(selected).toHaveLength(30);expect(selected.some(x=>Number(x.id.slice(1))<40)).toBe(false)});it('excludes the latest 30 when cycling',()=>{const history=bank.slice(0,95).map(x=>x.id);const selected=selectQuestions(bank,history,30,()=>.5);expect(selected.some(x=>Number(x.id.slice(1))>=65&&Number(x.id.slice(1))<95)).toBe(false)})});
+describe('answer shuffle',()=>{it('keeps the correct answer aligned with its text',()=>{const q=shuffleQuestion(bank[0],()=>.1);expect(q.options[q.correct]).toBe('ถูก');expect(q.options).toHaveLength(4)})});
